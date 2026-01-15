@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+
+<f:metadata>
+    <f:event type="preRenderView" listener="#{customerBean.loadCart}" />
+</f:metadata>
+
+<h:head>
+    <title>IceCreamy | Кошик</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link href="#{request.contextPath}/css/mycustom.css" rel="stylesheet" />
+</h:head>
+
+<h:body>
+    <ui:include src="header.xhtml" />
+    <main class="cart-page">
+        <div class="cart-container">
+            <h1 class="cart-title">Замовлення</h1>
+
+            <h:form id="cartForm">
+                <h:panelGroup id="cartContent" layout="block">
+                    <ui:fragment rendered="#{not empty customerBean.cart.items}">
+                        <div class="cart-layout">
+                            <div class="cart-items-wrapper">
+                                <div class="cart-table-header">
+                                    <div class="col-product">Продукт</div>
+                                    <div class="col-price text-center">Ціна</div>
+                                    <div class="col-qty text-center">Кількість</div>
+                                    <div class="col-total text-end">Сума</div>
+                                </div>
+                                <div class="cart-items-list">
+                                    <ui:repeat value="#{customerBean.cart.items}" var="item">
+                                        <div class="cart-item">
+                                            <div class="col-product">
+                                                <div class="item-img-box">
+                                                    <img src="#{request.contextPath}/#{item.product.imagePath}"
+                                                        alt="img" />
+                                                </div>
+                                                <span class="item-name">#{item.product.name}</span>
+                                            </div>
+                                            <div class="col-price">₴#{item.product.price}</div>
+
+                                            <div class="col-qty">
+                                                <div class="qty-wrapper">
+                                                    <div class="cart-controls rounded-pill px-2 d-flex">
+                                                        <h:commandLink styleClass="qty-btn" value="-"
+                                                            style="text-decoration: none;">
+                                                            <f:ajax
+                                                                listener="#{customerBean.updateQuantity(item.product.productId, -1)}"
+                                                                render="cartForm :cartBadgeGroup" />
+                                                        </h:commandLink>
+                                                        <span class="qty-val px-1">#{item.quantity}</span>
+                                                        <h:commandLink styleClass="qty-btn" value="+"
+                                                            style="text-decoration: none;">
+                                                            <f:ajax
+                                                                listener="#{customerBean.updateQuantity(item.product.productId, 1)}"
+                                                                render="cartForm :cartBadgeGroup" />
+                                                        </h:commandLink>
+                                                    </div>
+                                                </div>
+                                                <h:commandLink
+                                                    action="#{customerBean.removeFromCart(item.product.productId)}"
+                                                    styleClass="text-danger small mt-1 d-block text-center">
+                                                    <i class="bi bi-trash"></i> Видалити
+                                                    <f:ajax render="cartForm :cartBadgeGroup" />
+                                                </h:commandLink>
+                                            </div>
+                                            <div class="col-total">₴#{item.product.price * item.quantity}</div>
+                                        </div>
+                                    </ui:repeat>
+                                </div>
+                            </div>
+
+                            <aside class="cart-summary">
+                                <div class="summary-box">
+                                    <div class="summary-line">
+                                        <span>Товарів у кошику:</span>
+                                        <span class="summary-val">#{customerBean.cart.size}</span>
+                                    </div>
+                                    <div class="summary-line divider">
+                                        <span>Вартість доставки:</span>
+                                        <span class="summary-val">0 ₴</span>
+                                    </div>
+                                    <div class="summary-line bold">
+                                        <span>Усього до сплати:</span>
+                                        <span class="summary-val">#{customerBean.cart.sum} ₴</span>
+                                    </div>
+                                    <h:commandButton value="Підтвердити" action="#{customerBean.checkout}"
+                                        styleClass="confirm-btn" style="max-width: 300px;">
+                                        <f:ajax execute="@form" render="cartContent :cartBadgeGroup"
+                                            onevent="handleCheckout" />
+                                    </h:commandButton>
+                                </div>
+                            </aside>
+                        </div>
+                    </ui:fragment>
+
+                    <ui:fragment rendered="#{empty customerBean.cart.items}">
+                        <div class="text-center p-5">
+                            <i class="bi bi-cart-x  " style="font-size: 5rem;"></i>
+                            <h2 class="mt-3">Ваш кошик порожній</h2>
+                            <h:link outcome="catalog" value="Перейти до покупок"
+                                styleClass="confirm-btn d-inline-block mt-3 text-decoration-none "
+                                style="max-width: 300px;" />
+                        </div>
+                    </ui:fragment>
+                </h:panelGroup>
+            </h:form>
+        </div>
+    </main>
+
+    <div class="modal fade" id="orderSuccessModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="background-color: var(--bg-cream); border-radius: 20px; border: 2px solid var(--accent-pink);">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-4"><i class="bi bi-check2-circle"
+                            style="font-size: 80px; color: var(--accent-pink);"></i></div>
+                    <h2 class="welcome-title mb-3">Замовлення успішно створене!</h2>
+                    <div class="d-grid gap-3">
+                        <h:link outcome="catalog" styleClass="confirm-btn m-0 text-decoration-none">
+                            <i class="bi bi-arrow-left"></i> Назад до магазину
+                        </h:link>
+                        <h:link outcome="my-account" styleClass="confirm-btn m-0 text-decoration-none"
+                            style="background-color: var(--deep-blue);">
+                            Переглянути мої замовлення
+                        </h:link>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function handleCheckout(data) {
+            if (data.status === 'success') {
+                const modal = new bootstrap.Modal(document.getElementById('orderSuccessModal'));
+                modal.show();
+            }
+        }
+    </script>
+</h:body>
+
+</html>

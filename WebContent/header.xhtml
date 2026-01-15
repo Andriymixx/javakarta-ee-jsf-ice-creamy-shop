@@ -1,0 +1,131 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <nav id="ice-header" class="d-flex align-items-center justify-content-between px-4">
+        <div class="d-flex align-items-center">
+            <h:link outcome="indexc" class="brand-logo">Ice Creamy</h:link>
+        </div>
+        <div class="nav-elements-container d-none d-lg-flex align-items-center">
+            <h:link outcome="indexc"
+                    styleClass="nav-item #{view.viewId == '/indexc.xhtml' ? 'active' : ''}">Головна
+            </h:link>
+            <div class="vertical-divider"></div>
+            <h:link outcome="contacts"
+                    styleClass="nav-item #{view.viewId == '/contacts.xhtml' ? 'active' : ''}">Контакти
+            </h:link>
+            <div class="vertical-divider"></div>
+            <h:link outcome="catalog"
+                    styleClass="nav-item #{view.viewId == '/catalog.xhtml' ? 'active' : ''}">Асортимент
+            </h:link>
+            <div class="vertical-divider"></div>
+            <h:link outcome="cart"
+                    styleClass="nav-item #{view.viewId == '/cart.xhtml' ? 'active' : ''}">
+                <i class="bi bi-cart3 header-icon-style"></i>
+                <span>Кошик</span>
+                <h:panelGroup id="cartBadgeGroup">
+                    <span class="badge rounded-pill ms-2">
+                        #{customerBean.cart.size}
+                    </span>
+                </h:panelGroup>
+            </h:link>
+            <div class="vertical-divider"></div>
+            <h:panelGroup id="auth-section" layout="block" styleClass="d-flex align-items-center">
+                <ui:fragment rendered="#{!sessionBean.isLoggedIn()}">
+                    <h:link outcome="login"
+                            styleClass="nav-item d-flex align-items-center #{view.viewId == '/login.xhtml' ? 'active' : ''}">
+                        <i class="bi bi-person-circle header-icon-style"></i>
+                        <span>Увійти в акаунт</span>
+                    </h:link>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.isLoggedIn()}">
+                    <h:link outcome="my-account"
+                            styleClass="nav-item d-flex align-items-center #{view.viewId == '/my-account.xhtml' ? 'active' : ''}">
+                        <i class="bi bi-person-check-fill header-icon-style"></i>
+                        <h:outputText value="#{sessionBean.userDisplayName}"/>
+                    </h:link>
+                </ui:fragment>
+            </h:panelGroup>
+        </div>
+        <i class="bi bi-list d-lg-none mobile-menu-trigger"
+           data-bs-toggle="offcanvas"
+           data-bs-target="#mobileMenu"
+           aria-controls="mobileMenu"></i>
+    </nav>
+
+    <h:panelGroup id="flash-messages">
+        <h:panelGroup rendered="#{not empty facesContext.messageList}">
+            <div class="toast-container position-fixed start-50 translate-middle-x" style="top: 70px; z-index: 9999;">
+                <ui:repeat value="#{facesContext.messageList}" var="msg">
+                    <div class="custom-toast fade show shadow-sm d-flex align-items-center px-3 py-2" role="alert">
+                        <i class="bi #{msg.severity.ordinal == 0 ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2"></i>
+                        <div class="toast-text">
+                            <strong>#{msg.summary}</strong> #{msg.detail}
+                        </div>
+                    </div>
+                </ui:repeat>
+            </div>
+        </h:panelGroup>
+    </h:panelGroup>
+
+    <div class="offcanvas offcanvas-end" data-bs-scroll="true"
+         data-bs-backdrop="true" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title fw-bold" id="mobileMenuLabel">Ice Creamy</h5>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <div class="mobile-nav-list">
+                <h:link outcome="indexc" class="mobile-nav-link #{view.viewId == '/indexc.xhtml' ? 'active' : ''}">
+                    Головна
+                </h:link>
+                <h:link outcome="contacts" class="mobile-nav-link #{view.viewId == '/contacts.xhtml' ? 'active' : ''}">
+                    Контакти
+                </h:link>
+                <h:link outcome="catalog" class="mobile-nav-link #{view.viewId == '/catalog.xhtml' ? 'active' : ''}">
+                    Асортимент
+                </h:link>
+                <hr class="mx-3 opacity-10"/>
+                <h:link outcome="cart"
+                        styleClass="mobile-nav-link #{view.viewId == '/cart.xhtml' ? 'active' : ''} ">
+                    <i class="bi bi-cart3 me-2"></i> Кошик (#{customerBean.cart.size})
+                </h:link>
+                <ui:fragment rendered="#{!sessionBean.isLoggedIn()}">
+                    <h:link outcome="login"
+                            styleClass="mobile-nav-link #{view.viewId == '/login.xhtml' ? 'active' : ''}"
+                            data-bs-dismiss="offcanvas">
+                        <i class="bi bi-person-circle me-2"></i> Увійти
+                    </h:link>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.isLoggedIn()}">
+                    <h:link outcome="my-account"
+                            styleClass="mobile-nav-link #{view.viewId == '/my-account.xhtml' ? 'active' : ''}"
+                            data-bs-dismiss="offcanvas">
+                        <i class="bi bi-person-check-fill me-2"></i> #{sessionBean.userDisplayName}
+                    </h:link>
+                </ui:fragment>
+            </div>
+        </div>
+    </div>
+    <script>
+        function initToasts() {
+            const toasts = document.querySelectorAll('.custom-toast');
+            toasts.forEach(toast => {
+                setTimeout(() => {
+                    toast.style.transition = "opacity 0.5s ease";
+                    toast.style.opacity = "0";
+                    setTimeout(() => toast.remove(), 500); // видалити з DOM після зникнення
+                }, 5000); // 5 секунд
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", initToasts);
+
+        function handleAjaxEvents(data) {
+            if (data.status === 'success') {
+                initToasts();
+            }
+        }
+    </script>
+</ui:composition>
+

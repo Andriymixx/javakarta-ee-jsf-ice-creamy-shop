@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+
+<h:head>
+    <title>IceCreamy | Product</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+    <link href="#{request.contextPath}/css/nouislider.min.css" rel="stylesheet"/>
+    <link href="#{request.contextPath}/css/mycustom.css" rel="stylesheet"/>
+</h:head>
+<f:metadata>
+    <f:viewParam name="id" value="#{customerBean.productId}"/>
+    <f:viewAction action="#{customerBean.loadSelectedProduct}"/>
+</f:metadata>
+<h:body>
+    <ui:include src="header.xhtml"/>
+    <h:form id="productForm">
+        <div id="product-details-section">
+            <div class="border-top border-bottom border-dark py-2">
+                <p id="about-cmpn" class="text-center m-0 fw-bold ">Опис продукту</p>
+            </div>
+            <h:panelGroup id="product-content" layout="block"
+                          style="display: flex; flex-direction: column; flex-grow: 1; overflow: hidden;">
+                <div class="container-fluid px-5 product-gradient-bg d-flex flex-column justify-content-center flex-grow-1 fade-in-content"
+                     style="background: #{not empty customerBean.selectedProduct.gradientStyle ? customerBean.selectedProduct.gradientStyle : 'none'}; transition: background 1s ease;">
+                    <div class="row align-items-center main-row w-100">
+                        <div class="col-12">
+                            <h3 class="fw-bold pt-4 text-center text-lg-start main-title"
+                                style="font-size: 38px; color: #{customerBean.selectedProduct.accentColor != null ? customerBean.selectedProduct.accentColor : '#E26A97'};">
+                                #{customerBean.selectedProduct.name}
+                            </h3>
+                        </div>
+                        <div class="col-lg-5 py-5 pe-lg-5">
+                            <div class="description-scroll-container"
+                                 style="color: #{customerBean.selectedProduct.accentColor != null ? customerBean.selectedProduct.accentColor : '#E26A97'};">
+                                <div class="description-text">
+                                    <p class="text-justify mb-4">
+                                        #{customerBean.selectedProduct.description}
+                                    </p>
+                                    <p class="text-justify">
+                                        #{customerBean.selectedProduct.name}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 text-center py-5">
+                            <h4 class="italian-name mb-0" style="color: #{customerBean.selectedProduct.accentColor};">
+                                #{not empty customerBean.selectedProduct.italianName ? customerBean.selectedProduct.italianName : 'Gelato Artigianale'}
+                            </h4>
+                            <div class="product-subtitle mb-4">
+                                <span class="h5 m-0 " style="color: #{customerBean.selectedProduct.accentColor};">
+                                    #{not empty customerBean.selectedProduct.ukrainianName ? customerBean.selectedProduct.ukrainianName : customerBean.selectedProduct.name}
+                                </span>
+                            </div>
+                            <div class="price-tag mb-4">
+                                <ui:fragment rendered="#{customerBean.selectedProduct.oldPrice > 0}">
+                                    <span class="text-decoration-line-through me-3 "
+                                          style="font-size: 36px; color: #{customerBean.selectedProduct.accentColor};">
+                                        <h:outputText value="#{customerBean.selectedProduct.oldPrice}">
+                                                <f:convertNumber pattern="#0"/>
+                                        </h:outputText>
+                                    </span>
+                                </ui:fragment>
+                                <span class="fw-bold current-price-val"
+                                      style="color: #{customerBean.selectedProduct.accentColor};">
+                                    #{customerBean.selectedProduct.price} ₴
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-center gap-3">
+                                <h:panelGroup id="cartActions" layout="block" styleClass="d-flex gap-3">
+
+                                    <h:panelGroup
+                                            rendered="#{customerBean.getQuantityInCart(customerBean.selectedProduct.productId) == 0}">
+                                        <h:commandLink
+                                                action="#{customerBean.addToCart(customerBean.selectedProduct.productId)}"
+                                                styleClass="btn-order-now text-decoration-none d-flex align-items-center justify-content-center"
+                                                style="background-color: #{customerBean.selectedProduct.accentColor}; min-width: 220px; color: white;">
+                                            <f:ajax execute="@this"
+                                                    render="cartActions :cartBadgeGroup :flash-messages"
+                                                    onevent="onAddToCartAjax"/>
+                                            <i class="bi bi-cart-plus me-2"></i> Додати у кошик
+                                        </h:commandLink>
+                                    </h:panelGroup>
+                                    <h:panelGroup
+                                            rendered="#{customerBean.getQuantityInCart(customerBean.selectedProduct.productId) > 0}"
+                                            layout="block" styleClass="d-flex gap-3">
+                                        <div class="qty-control-pill"
+                                             style="background-color: #{customerBean.selectedProduct.accentColor};">
+                                            <h:commandLink
+                                                    action="#{customerBean.updateQuantity(customerBean.selectedProduct.productId, -1)}"
+                                                    styleClass="qty-btn-detail text-decoration-none">
+                                                <f:ajax render="cartActions :cartBadgeGroup"/>
+                                                −
+                                            </h:commandLink>
+                                            <span class="qty-val-detail px-3">
+                                                #{customerBean.getQuantityInCart(customerBean.selectedProduct.productId)}
+                                                </span>
+                                            <h:commandLink
+                                                    action="#{customerBean.updateQuantity(customerBean.selectedProduct.productId, 1)}"
+                                                    styleClass="qty-btn-detail text-decoration-none">
+                                                <f:ajax render="cartActions :cartBadgeGroup"/>
+                                                +
+                                            </h:commandLink>
+                                        </div>
+                                        <h:link outcome="cart"
+                                                styleClass="btn-order-now text-decoration-none d-flex align-items-center justify-content-center"
+                                                style="background-color: #{customerBean.selectedProduct.accentColor};">
+                                            Замовити
+                                        </h:link>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="ice-cream-img-wrap">
+                                <img src="#{request.contextPath}/#{customerBean.selectedProduct.imagePath}"
+                                     alt="#{customerBean.selectedProduct.name}"
+                                     class="ice-cream-img"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+            <ui:include src="footer.xhtml"/>
+        </div>
+    </h:form>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="#{request.contextPath}/js/nouislider.min.js"></script>
+
+    <script>
+        function onAddToCartAjax(data) {
+                if (data.status === 'success') {
+                    if (typeof initToasts === 'function') initToasts();
+                }
+            }
+    </script>
+</h:body>
+</html>

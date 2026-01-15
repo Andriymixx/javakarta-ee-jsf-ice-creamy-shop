@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+
+<h:head>
+    <title>IceCreamy | Login</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+    <link href="#{request.contextPath}/css/nouislider.min.css" rel="stylesheet"/>
+    <link href="#{request.contextPath}/css/mycustom.css" rel="stylesheet"/>
+</h:head>
+
+<h:body>
+    <ui:include src="header.xhtml"/>
+    <main class="login-page">
+        <div class="login-visual">
+            <h:graphicImage value="images/login-bg.jpg" alt="Strawberry Ice Cream" styleClass="login-img"/>
+        </div>
+        <div class="login-content">
+            <div class="login-details">
+                <div class="welcome-section">
+                    <h1 class="welcome-title">Вітаємо!</h1>
+                    <p class="welcome-subtitle">Заповніть дані для ідентифікації</p>
+                </div>
+                <h:form id="loginForm" styleClass="login-form">
+                    <h:panelGroup id="msgPanel">
+                        <h:outputText value="#{loginBean.loginMessage}"
+                                      style="color: red; font-size: 14px; margin-bottom: 10px; display: block;"
+                                      rendered="#{not empty loginBean.loginMessage}"/>
+                    </h:panelGroup>
+                    <div class="inputs-group">
+                        <div class="input-container">
+                            <h:outputLabel for="email" value="Email" styleClass="input-label"/>
+                            <h:inputText id="email" value="#{loginBean.email}"
+                                         styleClass="custom-input"
+                                         p:placeholder="example@mail.com"
+                                         required="true"
+                                         requiredMessage="Введіть email">
+                                <f:passThroughAttribute name="type" value="email"/>
+                            </h:inputText>
+                        </div>
+                        <div class="input-container">
+                            <h:outputLabel for="password" value="Пароль" styleClass="input-label"/>
+                            <h:inputSecret id="password" value="#{loginBean.password}"
+                                           styleClass="custom-input"
+                                           p:placeholder="••••••••"
+                                           required="true"
+                                           requiredMessage="Введіть пароль"/>
+                        </div>
+                    </div>
+                    <div class="form-options">
+                        <label class="login-checkbox">
+                            <h:selectBooleanCheckbox value="#{loginBean.rememberMe}" id="rememberMe"/>
+                            <span class="login-checkmark"></span>
+                            <span class="option-text">Запам'ятати</span>
+                        </label>
+                        <h:link outcome="sign-up" value="Не зареєстровані?" styleClass="signup-link"/>
+                    </div>
+                    <h:commandButton value="Увійти" action="#{loginBean.login}" styleClass="login-btn">
+                        <f:ajax execute="@form" render="msgPanel"/>
+                    </h:commandButton>
+                </h:form>
+            </div>
+        </div>
+    </main>
+
+</h:body>
+</html>

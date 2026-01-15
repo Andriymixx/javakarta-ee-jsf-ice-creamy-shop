@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+
+<h:head>
+    <title>IceCreamy: Мій акаунт</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+    <link href="#{request.contextPath}/css/mycustom.css" rel="stylesheet"/>
+</h:head>
+<h:body>
+    <ui:include src="header.xhtml"/>
+    <main class="profile-page">
+        <div class="profile-container">
+            <h1 class="profile-main-title mt-4">Акаунт</h1>
+            <div class="profile-layout">
+                <aside class="profile-sidebar">
+                    <nav class="sidebar-nav">
+                        <a href="javascript:void(0)" class="profile-nav active" data-target="info">
+                            <i class="bi bi-person-circle header-icon-style"></i>
+                            Інформація про акаунт
+                        </a>
+                        <div class="nav-divider"></div>
+                        <a href="javascript:void(0)" class="profile-nav" data-target="orders">
+                            <i class="bi bi-bag header-icon-style"></i>
+                            Замовлення
+                        </a>
+                        <h:panelGroup rendered="#{sessionBean.currentUser.role == 'ADMIN'}">
+                            <div class="nav-divider"></div>
+                            <h:link outcome="admin" styleClass="profile-nav">
+                                <i class="bi bi-briefcase header-icon-style"></i>
+                                Адмін панель
+                            </h:link>
+                        </h:panelGroup>
+                        <div class="nav-divider"></div>
+                        <h:form>
+                            <h:commandLink action="#{sessionBean.logout()}" styleClass="profile-nav logout">
+                                <i class="bi bi-box-arrow-left header-icon-style"></i>
+                                Вийти з акаунту
+                            </h:commandLink>
+                        </h:form>
+                    </nav>
+                </aside>
+
+                <section id="info-section" class="profile-content tab-content">
+                    <div class="content-header">
+                        <h2 class="content-title">Особисті дані</h2>
+                        <button type="button" class="edit-profile-btn" onclick="toggleEdit(false)">Редагувати</button>
+                    </div>
+                    <h:form id="profileForm" styleClass="profile-form">
+                        <div class="form-grid">
+                            <div class="input-container">
+                                <span class="input-label">Ім'я</span>
+                                <h:inputText id="firstName" value="#{sessionBean.currentUser.firstName}"
+                                             styleClass="custom-input" readonly="true"/>
+                            </div>
+                            <div class="input-container">
+                                <span class="input-label">Прізвище</span>
+                                <h:inputText id="lastName" value="#{sessionBean.currentUser.surName}"
+                                             styleClass="custom-input" readonly="true"/>
+                            </div>
+                            <div class="input-container">
+                                <span class="input-label">Електронна пошта</span>
+                                <h:inputText value="#{sessionBean.currentUser.email}"
+                                             styleClass="custom-input" readonly="true"/>
+                            </div>
+                            <div class="input-container">
+                                <span class="input-label">Номер телефону</span>
+                                <h:inputText id="phone"
+                                             styleClass="custom-input" readonly="true"/>
+                            </div>
+                        </div>
+                        <h:commandButton id="saveProfileBtn" value="Зберегти зміни"
+                                         action="#{userBean.updateProfile()}"
+                                         styleClass="edit-profile-btn mt-3" style="display:none;">
+                            <f:ajax execute="@form" render="@form flash-messages" onevent="onProfileUpdate"/>
+                        </h:commandButton>
+                    </h:form>
+                </section>
+
+                <section id="orders-section" class="profile-content tab-content" style="display: none;">
+                    <div class="content-header">
+                        <h2 class="content-title">Мої замовлення</h2>
+                    </div>
+                    <div class="orders-list">
+                        <h:form id="ordersForm">
+                            <table class="table ice-custom-table align-middle">
+                                <thead>
+                                <tr style="color: var(--deep-blue); font-weight: 600;">
+                                    <th>№</th>
+                                    <th>Дата</th>
+                                    <th>К-сть товару</th>
+                                    <th>Сума</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <ui:repeat value="#{customerBean.userOrders}" var="order">
+                                    <tr onclick="$(this).find('.view-details-btn').click();" style="cursor:pointer">
+                                        <td>##{order.orderId}</td>
+                                        <td>
+                                            <h:outputText value="#{order.timestamp}">
+                                                <f:convertDateTime pattern="dd.MM.yyyy"/>
+                                            </h:outputText>
+                                        </td>
+                                        <td>#{order.size}</td>
+                                        <td>#{order.amount} ₴</td>
+                                        <td style="display:none">
+                                            <h:commandLink id="btn" styleClass="view-details-btn"
+                                                           onclick="event.stopPropagation();">
+                                                <f:ajax listener="#{customerBean.viewOrderDetails(order.orderId)}"
+                                                        render=":orderDetailsPanel"
+                                                        onevent="showOrderModal"/>
+                                            </h:commandLink>
+                                        </td>
+                                    </tr>
+                                </ui:repeat>
+                                </tbody>
+                            </table>
+                        </h:form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <h:panelGroup id="orderDetailsPanel">
+        <div id="order_details_overlay" class="order-modal-overlay" style="display: none;">
+            <ui:fragment rendered="#{not empty customerBean.selectedOrder}">
+                <div class="order-modal-container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-cart-check-fill text-purple" style="font-size: 40px;"></i>
+                            <div>
+                                <h4 class="text-purple m-0">Деталі замовлення <span>##{customerBean.selectedOrder.orderId}</span>
+                                </h4>
+                                <small class="text-muted">Дата:
+                                    <h:outputText value="#{customerBean.selectedOrder.timestamp}">
+                                        <f:convertDateTime pattern="dd.MM.yyyy HH:mm"/>
+                                    </h:outputText>
+                                </small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close-modal" onclick="closeOrderModal()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                    <div class="cart-items-wrapper" style="min-width: 450px;">
+                        <div class="cart-table-header">
+                            <div class="col-product">Продукт</div>
+                            <div class="col-price text-center">Ціна</div>
+                            <div class="col-qty text-center">Кількість</div>
+                            <div class="col-total text-end">Сума</div>
+                        </div>
+                        <div class="cart-items-list">
+                            <ui:repeat value="#{customerBean.selectedOrder.items}" var="item">
+                                <div class="cart-item">
+                                    <div class="col-product">
+                                        <div class="item-img-box">
+                                            <img src="#{request.contextPath}/#{item.imagePath}" alt="img"/>
+                                        </div>
+                                        <span class="item-name">#{item.productName}</span>
+                                    </div>
+                                    <div class="col-price">₴#{item.priceAtPurchase}</div>
+                                    <div class="col-qty text-center">#{item.quantity}</div>
+                                    <div class="col-total">₴#{item.priceAtPurchase * item.quantity}</div>
+                                </div>
+                            </ui:repeat>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-4">
+                        <div class="text-end">
+                            <p class="m-0 text-muted">Всього одиниць товару: #{customerBean.selectedOrder.size}</p>
+                            <h3 class="text-purple">Разом: ₴#{customerBean.selectedOrder.amount}</h3>
+                        </div>
+                    </div>
+                </div>
+            </ui:fragment>
+        </div>
+    </h:panelGroup>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $('.profile-nav').on('click', function(e) {
+            const target = $(this).data('target');
+            if (!target) return;
+            $('.profile-nav').removeClass('active');
+            $(this).addClass('active');
+            $('.tab-content').hide();
+            $('#' + target + '-section').fadeIn(300);
+        });
+
+        function showOrderModal(data) {
+            if (data.status === 'success') {
+                $('#order_details_overlay').fadeIn(300).css('display', 'flex');
+            }
+        }
+
+        function closeOrderModal() {
+            $('#order_details_overlay').fadeOut(300);
+        }
+
+        $(window).on('click', function(e) {
+            if ($(e.target).is('#order_details_overlay')) closeOrderModal();
+        });
+
+        function toggleEdit(isSaving) {
+            const inputs = $('.profile-form .custom-input');
+            const saveBtn = $('[id$="saveProfileBtn"]');
+            const editBtn = $('.edit-profile-btn:not([id$="saveProfileBtn"])');
+
+            if (inputs.prop('readonly')) {
+                inputs.prop('readonly', false).addClass('editable');
+                saveBtn.show();
+                editBtn.text('Скасувати');
+            } else {
+                inputs.prop('readonly', true).removeClass('editable');
+                saveBtn.hide();
+                editBtn.text('Редагувати');
+            }
+        }
+
+        function onProfileUpdate(data) {
+            if (data.status === 'success') {
+                toggleEdit(true);
+                if(typeof initToasts === 'function') initToasts();
+            }
+        }
+    </script>
+</h:body>
+</html>

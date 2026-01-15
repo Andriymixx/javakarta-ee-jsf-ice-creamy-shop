@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0"
+             xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+    <persistence-unit name="icecreamy">
+
+		<jta-data-source>java:/PostgresDS</jta-data-source>
+
+		<class>com.icecreamy.entity.Customer</class>
+        <class>com.icecreamy.entity.OrderItem</class>
+		<class>com.icecreamy.entity.Order</class>
+		<class>com.icecreamy.entity.Product</class>
+        <class>com.icecreamy.entity.CartItem</class>
+		<class>com.icecreamy.entity.Cart</class>
+
+		<properties>
+			<property name="jboss.entity.manager.jndi.name" value="java:/EntityManager"/>
+			<property name="jboss.entity.manager.factory.jndi.name" value="java:/EntityManagerFactory"/>
+			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
+			<property name="hibernate.show_sql" value="false" />
+            <property name="hibernate.format_sql" value="false" />
+	        <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+	        <property name="hibernate.enable_lazy_load_no_trans" value="true" />  
+		</properties>
+
+	</persistence-unit>
+</persistence>

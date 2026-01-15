@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+
+<h:head>
+    <title>IceCreamy | New Design</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="https://fonts.googleapis.com/css?family=Varela+Round|Open+Sans:300,400,700,800" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <link href="#{request.contextPath}/css/nouislider.min.css" rel="stylesheet"/>
+    <link href="#{request.contextPath}/css/mycustom.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+</h:head>
+
+<h:body>
+    <ui:include src="header.xhtml"/>
+    <h:form id="mainForm">
+        <div id="hero-banner">
+            <div class="hero-content">
+                <h1 class="hero-title">Ice Creamy</h1>
+                <h1 class="hero-subtitle">"Італійське літо у кожному шматочку"</h1>
+                <a href="#about-section" class="hero-btn">
+                    <i class="bi bi-chevron-double-down"></i>
+                    Дізнатись більше
+                    <i class="bi bi-chevron-double-down"></i>
+                </a>
+            </div>
+        </div>
+        <div id="about-section">
+            <div class="border-top border-bottom border-dark py-2">
+                <p id="about-cmpn" class="text-center m-0 fw-bold ">Про нашу компанію</p>
+            </div>
+            <h:panelGroup id="about-content" layout="block"
+                          style="display: flex; flex-direction: column; flex-grow: 1; overflow: hidden;">
+                <div class="container-fluid px-5 product-gradient-bg d-flex flex-column justify-content-center flex-grow-1 fade-in-content"
+                     style="background: #{not empty customerBean.currentFeaturedProduct.gradientStyle ? customerBean.currentFeaturedProduct.gradientStyle : 'none'}; transition: background 1s ease;">
+                    <div class="row align-items-center main-row w-100">
+                        <div class="col-12">
+                            <h3 class="fw-bold  pt-4 text-center text-lg-start"
+                                style="font-size: 38px; color: #{customerBean.currentFeaturedProduct.accentColor != null ? customerBean.currentFeaturedProduct.accentColor : '#E26A97'};">
+                                Ice Creamy - це київська майстерня, яка готує морозиво за автентичним італійським
+                                рецептом.
+                            </h3>
+                        </div>
+                        <div class="col-lg-5 py-5 pe-lg-5">
+                            <div class="description-text "
+                                 style="font-size: 22px; color: #{customerBean.currentFeaturedProduct.accentColor != null ? customerBean.currentFeaturedProduct.accentColor : '#E26A97'};">
+                                <p class="text-justify mb-4">
+                                    Засновник майстерні, Богдан, є нащадком італійської родини, що здавна займалася
+                                    виготовленням морозива. Секретний рецепт дбайливо зберігався та передавався від
+                                    одного покоління до іншого.
+                                </p>
+                                <p class="text-justify">
+                                    Наш асортимент включає не тільки класичні вафлі, ріжки та сендвічі, а й розфасоване
+                                    морозиво, яке ви можете замовити з доставкою додому.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 text-center py-5">
+                            <ui:fragment rendered="#{not empty customerBean.currentFeaturedProduct}">
+                                <h4 class="italian-name mb-0"
+                                    style="color: #{customerBean.currentFeaturedProduct.accentColor};">
+                                    #{not empty customerBean.currentFeaturedProduct.italianName ? customerBean.currentFeaturedProduct.italianName : customerBean.currentFeaturedProduct.name}
+                                </h4>
+                                <div class="product-subtitle mb-4">
+                                <span class="h5 m-0 "
+                                      style="color: #{customerBean.currentFeaturedProduct.accentColor};">
+                                    #{not empty customerBean.currentFeaturedProduct.ukrainianName ? customerBean.currentFeaturedProduct.ukrainianName : customerBean.currentFeaturedProduct.name}
+                                </span>
+                                </div>
+                                <div class="price-tag mb-4">
+                                    <ui:fragment rendered="#{customerBean.currentFeaturedProduct.oldPrice > 0}">
+                                    <span class="text-decoration-line-through me-3 "
+                                          style="font-size: 36px; color: #{customerBean.currentFeaturedProduct.accentColor};">
+                                        <h:outputText value="#{customerBean.currentFeaturedProduct.oldPrice}">
+                                            <f:convertNumber pattern="#0"/>
+                                        </h:outputText>
+                                    </span>
+                                    </ui:fragment>
+                                    <span class="fw-bold current-price-val"
+                                          style="color: #{customerBean.currentFeaturedProduct.accentColor};">
+                                    #{customerBean.currentFeaturedProduct.price} ₴
+                                </span>
+                                </div>
+                                <div class="d-flex justify-content-center gap-2 mb-5">
+                                    <ui:repeat value="#{customerBean.featuredProducts}" var="prod" varStatus="loop">
+                                        <h:commandLink action="#{customerBean.switchFeaturedProduct(loop.index)}"
+                                                       styleClass="dot #{customerBean.featuredIndex == loop.index ? 'active' : ''} "
+                                                       style="background-color: #{customerBean.featuredIndex == loop.index ? customerBean.currentFeaturedProduct.accentColor : 'transparent'};
+
+                                                          outline: 2px solid #{customerBean.currentFeaturedProduct.accentColor}">
+                                            <f:ajax execute="@this" render=":mainForm:about-content"/>
+                                        </h:commandLink>
+                                    </ui:repeat>
+                                </div>
+                                <div class="d-flex justify-content-center gap-3">
+                                    <h:link outcome="catalog"
+                                            styleClass="btn btn-about text-decoration-none"
+                                            style="background-color: #{customerBean.currentFeaturedProduct.accentColor};">
+                                        Асортимент
+                                    </h:link>
+                                    <h:link outcome="product"
+                                            styleClass="btn btn-about text-decoration-none"
+                                            style="background-color: #{customerBean.currentFeaturedProduct.accentColor};">
+                                        <f:param name="id" value="#{customerBean.currentFeaturedProduct.productId}"/>
+                                        Про цей товар
+                                    </h:link>
+                                </div>
+                            </ui:fragment>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="ice-cream-img-wrap">
+                                <img src="#{request.contextPath}/#{customerBean.currentFeaturedProduct.imagePath}"
+                                     alt="#{customerBean.currentFeaturedProduct.name}"
+                                     class="ice-cream-img"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+            <ui:include src="footer.xhtml"/>
+        </div>
+    </h:form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="#{request.contextPath}/js/nouislider.min.js"></script>
+</h:body>
+</html>

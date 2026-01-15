@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <title>Ice Creamy | Контакти</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+    <link href="#{request.contextPath}/css/mycustom.css" rel="stylesheet"/>
+</h:head>
+
+<h:body>
+    <ui:include src="header.xhtml"/>
+
+    <main class="contacts-page">
+        <div class="container-contacts">
+            <section class="contacts-intro mt-5">
+                <p class="intro-text">
+                    Ми завжди раді бачити вас у наших магазинах у Хмельницькому, де ви можете особисто обрати з
+                    асортименту нашого морозива: вафлі, ріжки, сендвічі та багато іншого. Ми знаходимося за наступними
+                    адресами:
+                </p>
+                <ul class="address-list">
+                    <li class="address-item">ЦУМ, поверх 1</li>
+                    <li class="address-item">вул. Богдана Хмельницького, 32</li>
+                    <li class="address-item">вул. Богдана Хмельницького, 53а</li>
+                </ul>
+                <p class="schedule">
+                    <strong>Графік роботи:</strong> Понеділок – Неділя, 10:00 – 20:00
+                </p>
+            </section>
+            <section class="map-section my-4">
+                <div class="map-container">
+                    <div class="map-overlay">
+                        <h:outputLink value="https://www.google.com/maps" target="_blank" styleClass="map-button">
+                            Дивитись на мапі
+                        </h:outputLink>
+                    </div>
+                </div>
+            </section>
+            <section class="delivery-info mb-5">
+                <h2 class="section-title">Доставка до вашого дому:</h2>
+                <div class="delivery-text">
+                    <p>
+                        Щоб насолодитися морозивом Ice Creamy не виходячи з дому, скористайтесь нашою послугою доставки
+                        в межах міста. Ми забезпечуємо спеціальні термосумки, які зберігають морозиво в ідеальному стані
+                        навіть у спекотні дні.
+                    </p>
+                    <div class="phone-link d-flex align-items-center gap-2">
+                        <i class="bi bi-telephone-fill"></i>
+                        <span>
+                            Замовити доставку можна через сайт або за телефоном:
+                            <strong>+380 (12) 345-67-89</strong>
+                        </span>
+                    </div>
+                    <p class="mt-3">Залишайтесь на зв'язку з Ice Creamy та смакуйте морозиво, де б ви не були!</p>
+                </div>
+            </section>
+        </div>
+    </main>
+</h:body>
+</html>
